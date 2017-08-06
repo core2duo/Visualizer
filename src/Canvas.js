@@ -29,6 +29,7 @@ export default class Canvas extends React.Component {
       uploaded: false,
       move: 0,
       maxMoves: 0,
+      filename: "",
     };
   }
 
@@ -38,7 +39,6 @@ export default class Canvas extends React.Component {
 
   applyMoves(to) {
     let data = JSON.parse(JSON.stringify(this.data));
-    console.log(data, this.data);
     for (let i = 0; i <= to; i++) {
       this.applyMove(data, this.state.data['moves'][i]);
     }
@@ -116,12 +116,19 @@ export default class Canvas extends React.Component {
             y: site['y'],
           }
         }
+        let punters = data['punters'];
+        for (let i = 1; i < data['moves'].length /punters; i++) {
+          for (let j = punters * (i - 1) + data['punter']; j < punters * i; j++) {
+            data['moves'][j] = data['moves'][j + punters]
+          }
+        }
 
         that.data = JSON.parse(JSON.stringify(data));
         that.setState({
           data: data,
           uploaded: true,
           maxMoves: data['moves'].length - 1,
+          filename: file.name,
         });
         that.changeMove(0);
       }
@@ -180,6 +187,7 @@ export default class Canvas extends React.Component {
           )}
           {this.state.uploaded && (
             <div className="moves-container">
+              <p>{this.state.filename}</p>
               <div>
                 <button onClick={this.start}>Start</button>
                 {' '}
