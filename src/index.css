@@ -18,7 +18,7 @@ body {
   font-family: sans-serif;
 }
 .container {
-  width: 1200px;
+  width: 1300px;
   margin: 20px auto;
 }
 canvas {
@@ -27,10 +27,10 @@ canvas {
 }
 .controls {
   float: right;
-  width: 230px;
+  width: 330px;
 }
 .controls__move {
-  width: 50px;
+  width: 60px;
   text-align: center;
 }
 .moves {
@@ -40,11 +40,22 @@ canvas {
 }
 .moves__move {
   display: block;
-  padding: 5px;
+  padding: 5px 0;
 }
 .moves__move.moves__move_current {
   background: #78b370;
 }
+.moves__move.moves__move_player {
+  font-weight: bold;
+}
 .moves-container {
   margin-top: 10px;
+}
+.scores {
+  list-style-type: none;
+  padding: 0;
+  margin: 5px 0;
+}
+.scores__score {
+  display: block;
 }
