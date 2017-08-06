@@ -3,6 +3,25 @@ import React from 'react';
 import Drawer from './Drawer';
 
 export default class Canvas extends React.Component {
+  COLORS = [
+    '#f00',
+    '#0f0',
+    '#00f',
+    '#ff0',
+    '#f0f',
+    '#0ff',
+    '#f55',
+    '#5f5',
+    '#55f',
+    '#ff5',
+    '#f5f',
+    '#5ff',
+    '#faa',
+    '#afa',
+    '#aaf',
+    '#faf',
+  ];
+
   constructor(props) {
     super(props);
     this.state = {
@@ -174,7 +193,7 @@ export default class Canvas extends React.Component {
                 {' '}
                 <button onClick={this.next}>Next</button>
               </div>
-              <p>Selected player: {this.data['punter']}</p>
+              <p>Selected player: {this.data['punter']}{' '}<span className="current-player" style={{background: this.COLORS[this.data['punter']]}}/></p>
               <ul className="scores clearfix">
                 {this.state.data['scores'].map((score, index) => (
                   <li key={index} className="scores__score">Punter {score['punter']}: {score['score']}</li>

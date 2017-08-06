@@ -59,3 +59,7 @@ canvas {
 .scores__score {
   display: block;
 }
+.current-player {
+  padding: 0 10px;
+  margin-left: 10px;
+}
