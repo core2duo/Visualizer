@@ -33,24 +33,13 @@ let Drawer = (function () {
     ctx = canvas.getContext('2d');
   }
 
-  function setCam(sites) {
-    let minX = 9e5, minY = 9e5;
-    let maxX = 0, maxY = 0;
-    Object.keys(sites).forEach(id => {
-      let site = sites[id];
-      minX = Math.min(site['x'], minX);
-      minY = Math.min(site['y'], minY);
-      maxX = Math.max(site['x'], maxX);
-      maxY = Math.max(site['y'], maxY);
-    });
-
+  function setCam(width, height) {
     posMat = mat3.create();
-    mat3.fromTranslation(posMat, vec2.fromValues(-minX, -minY));
+    mat3.fromTranslation(posMat, vec2.fromValues(0, 0));
 
-    let w = ctx.canvas.width - PADDING * 2;
-    let h = ctx.canvas.height - PADDING * 2;
-    let xScale = w / (maxX - minX);
-    let yScale = h / (maxY - minY);
+    let xScale = ctx.canvas.width / width;
+    let yScale = ctx.canvas.height / height;
+    console.log(ctx.canvas.width, width, ctx.canvas.height, height, xScale, yScale);
     scale = Math.min(xScale, yScale);
   }
 
@@ -76,6 +65,13 @@ let Drawer = (function () {
       ctx.fill();
       ctx.closePath();
     });
+  }
+
+  function drawRect(x, y, color) {
+    const v = transform(x, y);
+
+    ctx.fillStyle = color;
+    ctx.fillRect(v[0], v[1], scale, scale);
   }
 
   function drawRivers(map) {
@@ -108,13 +104,59 @@ let Drawer = (function () {
     }
   }
 
-  function draw(map) {
-    setCam(map['sites']);
-    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+  function ifWallBetween(rx, ry, px, py, field) {
 
-    drawSites(map['sites']);
-    drawRivers(map);
-    drawMines(map);
+    let min_x = Math.min(rx, px);
+    let max_x = Math.max(rx, px);
+    let min_y = Math.min(ry, py);
+    let max_y = Math.max(ry, py);
+
+    for (let x = min_x; x <= max_x; x++) {
+        for (let y = min_y; y <= max_y; y++) {
+            if (field[y][x] === '#') {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+  function draw(input, output) {
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    setCam(input.width, input.height);
+    let field = [];
+    for (let i = 0; i < input.height; i++) {
+      field.push(new Array(input.width));
+    }
+
+    for (let p of input['#']) {
+      field[p.y][p.x] = '#';
+      drawRect(p.x, p.y, 'rgba(0, 0, 0, 0.9)');
+    }
+    for (let p of input['.']) {
+      field[p.y][p.x] = '.';
+      drawRect(p.x, p.y, '#fff');
+    }
+    for (let p of input['-']) {
+      field[p.y][p.x] = '-';
+      drawRect(p.x, p.y, '#444');
+    }
+
+    for (let p of output.b) {
+      drawRect(p.x, p.y, 'rgba(0, 0, 255, 0.5)');
+    }
+    for (let p of output.r) {
+      for (let x = p.x - input.radius; x <= p.x + input.radius; x++) {
+        if (x < 0 || x >= input.width) continue;
+
+        for (let y = p.y - input.radius; y <= p.y + input.radius; y++) {
+          if (y < 0 || y >= input.height) continue;
+          if (! ifWallBetween(x, y, p.x, p.y, field)) {
+            drawRect(x, y, 'rgba(0, 255, 0, 0.2)');
+          }
+        }
+      }
+    }
   }
 
   return {
